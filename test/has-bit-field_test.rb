@@ -27,10 +27,10 @@ class HasBitFieldTest < Test::Unit::TestCase
     assert !p.reads_books?
 
     p.watches_tv = true
-    assert p.likes_ice_cream?
-    assert !p.plays_golf?
-    assert p.watches_tv?
-    assert !p.reads_books?
+    assert p.likes_ice_cream
+    assert !p.plays_golf
+    assert p.watches_tv
+    assert !p.reads_books
 
     p.watches_tv = false
     p.plays_golf = true

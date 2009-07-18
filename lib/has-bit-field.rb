@@ -6,8 +6,11 @@ module HasBitField
   def has_bit_field(bit_field_attribute, *args)
     args.each_with_index do |field,i|
       flag = (1 << i)
-      define_method("#{field}?") do
+      define_method(field) do
         (send(bit_field_attribute) & flag) != 0
+      end
+      define_method("#{field}?") do
+        send(field)
       end
       define_method("#{field}=") do |v|
         if v.to_s == "true" || v.to_s == "1"
