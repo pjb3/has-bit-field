@@ -1,7 +1,0 @@
-= has-bit-field
-
-Description goes here.
-
-== Copyright
-
-Copyright (c) 2009 Paul Barry. See LICENSE for details.
