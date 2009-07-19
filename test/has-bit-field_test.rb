@@ -29,10 +29,10 @@ class HasBitFieldTest < Test::Unit::TestCase
       assert p.respond_to?("#{f}="), "Expected #{p.inspect} to respond to #{f}="
     end
     
-    assert_equal p.likes_ice_cream_bit, (1 << 0)
-    assert_equal p.plays_golf_bit, (1 << 1)
-    assert_equal p.watches_tv_bit, (1 << 2)
-    assert_equal p.reads_books_bit, (1 << 3)
+    assert_equal Person.likes_ice_cream_bit, (1 << 0)
+    assert_equal Person.plays_golf_bit, (1 << 1)
+    assert_equal Person.watches_tv_bit, (1 << 2)
+    assert_equal Person.reads_books_bit, (1 << 3)
     
     p.likes_ice_cream = true
     assert p.likes_ice_cream?

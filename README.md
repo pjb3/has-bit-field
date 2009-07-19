@@ -13,7 +13,7 @@ Now in one of your models, you define a bit field like this:
       has_bit_field :bit_field, :likes_ice_cream, :plays_golf, :watches_tv, :reads_books
     end
 
-This means that your database will have an integer column called `bit_field` which will hold the actual bit field.  This will generate getter and setter methods for each of the fields.  You can use it like this:
+This means that your database will have an integer column called `bit_field` which will hold the actual bit field.  This will generate getter and setter methods for each of the fields.  It will also generate a method that has `_bit` as a suffix which will give you the decimal value of the bit that that field is represented by in the bit field.  Also there will be a named scope for that field, as well as a named scope prefixed with `not_`, if class you are adding the bit field to responds to `named_scope`.  You can use it like this:
 
     $ script/console 
     Loading development environment (Rails 2.3.2)
@@ -31,7 +31,11 @@ This means that your database will have an integer column called `bit_field` whi
     => true
     >> p.reads_books?
     => false
-
+    >> Person.plays_golf_bit
+    => 4
+    >> p = Person.likes_ice_cream.first
+    => #<Person id: 1, bit_field: 3, created_at: "2009-07-18 03:04:06", updated_at: "2009-07-18 03:04:06">
+    
 
 Copyright
 ---------
