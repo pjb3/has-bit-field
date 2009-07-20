@@ -1,1 +1,2 @@
-ActiveRecord::Base.extend(HasBitField)
+require 'has-bit-field'
+ActiveRecord::Base.extend HasBitField
