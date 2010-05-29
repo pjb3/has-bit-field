@@ -77,6 +77,7 @@ class HasBitFieldTest < Test::Unit::TestCase
   end
 
   def test_named_scopes
+    Person.delete_all
     a = Person.new
     a.plays_golf = true
     a.reads_books = true
@@ -101,5 +102,19 @@ class HasBitFieldTest < Test::Unit::TestCase
     assert_equal [a], Person.reads_books.all(:order => "id")
     assert_equal [b,c], Person.not_reads_books.all(:order => "id")
   end
+  def test_dirty_attributes
+    Person.delete_all
+    a = Person.new
+    a.plays_golf = true
+    a.reads_books = true
+    assert a.save
 
+    a.plays_golf = false
+    assert_equal false, a.plays_golf
+    assert_equal true, a.plays_golf_was
+    assert a.plays_golf_changed?
+    assert_equal true, a.reads_books
+    assert_equal true, a.reads_books_was
+    assert !a.reads_books_changed?
+  end
 end

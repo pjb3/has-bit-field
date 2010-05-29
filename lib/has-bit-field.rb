@@ -21,6 +21,12 @@ module HasBitField
           send("#{bit_field_attribute}=", ((send(bit_field_attribute) || 0) & ~self.class.send("#{field}_bit")))
         end
       end
+      define_method("#{field}_was") do
+        (send("#{bit_field_attribute}_was") & self.class.send("#{field}_bit")) != 0
+      end
+      define_method("#{field}_changed?") do
+        send(field) != send("#{field}_was")
+      end
       if(respond_to?(:named_scope))
         named_scope field, :conditions => ["(#{table_name}.#{bit_field_attribute} & ?) != 0", send("#{field}_bit")]
         named_scope "not_#{field}", :conditions => ["(#{table_name}.#{bit_field_attribute} & ?) = 0", send("#{field}_bit")]
