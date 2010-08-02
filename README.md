@@ -36,7 +36,14 @@ This means that your database will have an integer column called `bit_field` whi
     >> p = Person.likes_ice_cream.first
     => #<Person id: 1, bit_field: 3, created_at: "2009-07-18 03:04:06", updated_at: "2009-07-18 03:04:06">
     
+One of the great advantages of this approach is that it is easy to add additional flags as your application evolves without the overhead of adding new table columns since a single integer will be able to store at least 31 boolean flags.  A simple amendment to the model will create the new flag on the existing integer column 'on-the-fly'.  However, the order of the flags is vitally important and you should only ever add new flags on the end.
 
+    class Person < ActiveRecord::Base
+      has_bit_field :bit_field, :likes_ice_cream, :plays_golf, :watches_tv, :reads_books, :nut_allergy
+    end
+
+The new flag will be evaluated as false for existing rows on the database table until their values are explicitly set.  Be careful with the peanuts!
+      
 Copyright
 ---------
 
