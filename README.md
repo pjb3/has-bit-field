@@ -43,6 +43,13 @@ One of the great advantages of this approach is that it is easy to add additiona
     end
 
 The new flag will be evaluated as false for existing rows on the database table until their values are explicitly set.  Be careful with the peanuts!
+
+Another gotcha to be aware of is when combining a bit field with Active Record's `validates_acceptance_of`.  When you call `validates_acceptance_of`, if there is no database column, Active Record will define an `attr_accessor` for that boolean field.  If you have already defined the bit field, this will clobber those methods.  Also, you need to set the value it's looking for to `true` instead of the default of `"1"`.  So here's an example of how to use it:
+
+    class Person < ActiveRecord::Base
+      validates_acceptance_of :read_books, :message => "You must agree to read", :accept => true
+      has_bit_field :bit_field, :likes_ice_cream, :plays_golf, :watches_tv, :reads_books
+    end
       
 Copyright
 ---------
