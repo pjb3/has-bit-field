@@ -9,7 +9,7 @@ module HasBitField
         (1 << i)
       end
       define_method(field) do
-        (send(bit_field_attribute) & self.class.send("#{field}_bit")) != 0
+        (send(bit_field_attribute).to_i & self.class.send("#{field}_bit")) != 0
       end
       define_method("#{field}?") do
         send(field)
@@ -28,8 +28,8 @@ module HasBitField
         send(field) != send("#{field}_was")
       end
       if(respond_to?(:named_scope))
-        named_scope field, :conditions => ["(#{table_name}.#{bit_field_attribute} & ?) != 0", send("#{field}_bit")]
-        named_scope "not_#{field}", :conditions => ["(#{table_name}.#{bit_field_attribute} & ?) = 0", send("#{field}_bit")]
+        named_scope field, :conditions => ["#{table_name}.#{bit_field_attribute} IS NOT NULL AND (#{table_name}.#{bit_field_attribute} & ?) != 0", send("#{field}_bit")]
+        named_scope "not_#{field}", :conditions => ["#{table_name}.#{bit_field_attribute} IS NULL OR (#{table_name}.#{bit_field_attribute} & ?) = 0", send("#{field}_bit")]
       end
     end
   end

@@ -1,9 +1,5 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-require 'rubygems'
-require 'activerecord'
-require File.join(File.dirname(__FILE__), "../rails/init")
-
 ActiveRecord::Base.establish_connection(
   :adapter => "sqlite3",
   :database  => ":memory:"
@@ -12,7 +8,7 @@ ActiveRecord::Base.establish_connection(
 #ActiveRecord::Base.logger = Logger.new(STDOUT)
 
 ActiveRecord::Base.connection.create_table(:people) do |t|
-  t.integer :bit_field, :default => 0
+  t.integer :bit_field
 end
 
 class Person < ActiveRecord::Base
