@@ -8,7 +8,7 @@ ActiveRecord::Base.establish_connection(
 #ActiveRecord::Base.logger = Logger.new(STDOUT)
 
 ActiveRecord::Base.connection.create_table(:people) do |t|
-  t.integer :bit_field
+  t.integer :bit_field, :null => true
 end
 
 class Person < ActiveRecord::Base
@@ -19,8 +19,8 @@ end
 
 
 ActiveRecord::Base.connection.create_table(:skills) do |t|
-  t.integer :outdoor_bit_field, :default => 0
-  t.integer :indoor_bit_field, :default => 0
+  t.integer :outdoor_bit_field, :default => 0, :null => false
+  t.integer :indoor_bit_field, :default => 0, :null => false
 end
 
 class Skill < ActiveRecord::Base
@@ -89,7 +89,7 @@ class HasBitFieldTest < Test::Unit::TestCase
     assert !p.reads_books?
   end
 
-  def test_named_scopes
+  def test_named_scopes_on_nullable_column
     Person.delete_all
     a = Person.new
     a.plays_golf = true
@@ -101,9 +101,9 @@ class HasBitFieldTest < Test::Unit::TestCase
     b.watches_tv = true
     assert b.save
 
-    c = Person.create!
+    c = Person.create! :bit_field => 0
 
-    assert_equal [b], Person.likes_ice_cream.all(:order => "id")    
+    assert_equal [b], Person.likes_ice_cream.all(:order => "id")
     assert_equal [a,c], Person.not_likes_ice_cream.all(:order => "id")
 
     assert_equal [a], Person.plays_golf.all(:order => "id")
@@ -114,6 +114,32 @@ class HasBitFieldTest < Test::Unit::TestCase
 
     assert_equal [a], Person.reads_books.all(:order => "id")
     assert_equal [b,c], Person.not_reads_books.all(:order => "id")
+  end
+
+  def test_named_scopes_on_non_nullable_column
+    Skill.delete_all
+    a = Skill.new
+    a.plays_piano = true
+    a.chops_trees = true
+    a.mops_floors = true
+    assert a.save, a.errors.full_messages.join(", ")
+
+    b = Skill.new
+    b.plays_piano = true
+    b.chops_trees = true
+    b.makes_soup = true
+    assert b.save, b.errors.full_messages.join(", ")
+
+    c = Skill.create! :plays_piano => true, :chops_trees => true
+
+    assert_equal [a,b,c], Skill.plays_piano.all(:order => "id")
+    assert_equal [], Skill.not_plays_piano.all(:order => "id")
+
+    assert_equal [a], Skill.mops_floors.all(:order => "id")
+    assert_equal [b,c], Skill.not_mops_floors.all(:order => "id")
+
+    assert_equal [b], Skill.makes_soup.all(:order => "id")
+    assert_equal [a,c], Skill.not_makes_soup.all(:order => "id")
   end
 
   def test_dirty_attributes
@@ -142,17 +168,17 @@ class HasBitFieldTest < Test::Unit::TestCase
     assert !s.cuts_hedges
 
     assert !s.valid?
-    assert s.errors.on(:chops_trees)
+    assert s.errors[:chops_trees]
 
     s.chops_trees = false
     assert !s.chops_trees?
     assert !s.valid?
-    assert s.errors.on(:chops_trees)
+    assert s.errors[:chops_trees]
 
     s.chops_trees = true
     assert s.chops_trees?
     assert s.valid?
-    assert !s.errors.on(:chops_trees)
+    assert !s.errors[:chops_trees]
     assert s.save
   end
 
@@ -166,17 +192,17 @@ class HasBitFieldTest < Test::Unit::TestCase
     assert !s.makes_soup
 
     assert !s.valid?
-    assert s.errors.on(:plays_piano)
+    assert s.errors[:plays_piano]
 
     s.plays_piano = false
     assert !s.plays_piano?
     assert !s.valid?
-    assert s.errors.on(:plays_piano)
+    assert s.errors[:plays_piano]
 
     s.plays_piano = true
     assert s.plays_piano?
     assert s.valid?
-    assert !s.errors.on(:plays_piano)
+    assert !s.errors[:plays_piano]
     assert s.save
   end
 
