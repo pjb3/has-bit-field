@@ -5,11 +5,12 @@ has-bit-field allows you to use one attribute of an object to store a bit field 
 
 To use this with Active Record, you would first require this gem in `config/environment.rb`:
 
-    config.gem "pjb3-has-bit-field", :lib => "has-bit-field", :source => "http://gems.github.com"
+    config.gem "has-bit-field"
 
 Now in one of your models, you define a bit field like this:
 
     class Person < ActiveRecord::Base
+      extend HasBitField
       has_bit_field :bit_field, :likes_ice_cream, :plays_golf, :watches_tv, :reads_books
     end
 
@@ -39,6 +40,7 @@ This means that your database will have an integer column called `bit_field` whi
 One of the great advantages of this approach is that it is easy to add additional flags as your application evolves without the overhead of adding new table columns since a single integer will be able to store at least 31 boolean flags.  A simple amendment to the model will create the new flag on the existing integer column 'on-the-fly'.  However, the order of the flags is vitally important and you should only ever add new flags on the end.
 
     class Person < ActiveRecord::Base
+      extend HasBitField
       has_bit_field :bit_field, :likes_ice_cream, :plays_golf, :watches_tv, :reads_books, :nut_allergy
     end
 
@@ -47,6 +49,7 @@ The new flag will be evaluated as false for existing rows on the database table 
 Another gotcha to be aware of is when combining a bit field with Active Record's `validates_acceptance_of`.  When you call `validates_acceptance_of`, if there is no database column, Active Record will define an `attr_accessor` for that boolean field.  If you have already defined the bit field, this will clobber those methods.  Also, you need to set the value it's looking for to `true` instead of the default of `"1"`.  So here's an example of how to use it:
 
     class Person < ActiveRecord::Base
+      extend HasBitField
       validates_acceptance_of :read_books, :message => "You must agree to read", :accept => true
       has_bit_field :bit_field, :likes_ice_cream, :plays_golf, :watches_tv, :reads_books
     end
