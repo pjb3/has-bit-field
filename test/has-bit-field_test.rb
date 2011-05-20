@@ -178,7 +178,7 @@ class HasBitFieldTest < Test::Unit::TestCase
     s.chops_trees = true
     assert s.chops_trees?
     assert s.valid?
-    assert !s.errors[:chops_trees]
+    assert s.errors[:chops_trees].blank?
     assert s.save
   end
 
@@ -202,7 +202,7 @@ class HasBitFieldTest < Test::Unit::TestCase
     s.plays_piano = true
     assert s.plays_piano?
     assert s.valid?
-    assert !s.errors[:plays_piano]
+    assert s.errors[:plays_piano].blank?
     assert s.save
   end
 
