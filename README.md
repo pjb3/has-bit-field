@@ -3,6 +3,14 @@ has-bit-field
 
 has-bit-field allows you to use one attribute of an object to store a bit field which stores the boolean state for multiple flags.
 
+**Rails 3.0.x**
+
+Add the gem to your Gemfile. 
+
+    gem 'has-bit-field'
+
+**Rails 2.3.x**
+
 To use this with Active Record, you would first require this gem in `config/environment.rb`:
 
     config.gem "has-bit-field"
