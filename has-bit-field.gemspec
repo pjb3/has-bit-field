@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   s.description = "Provides an easy way to work with bit fields in active record"
 
   s.rubyforge_project = "has-bit-field"
-  s.add_development_dependency "sqlite3-ruby"
-  s.add_development_dependency "activerecord", "~> 2.3.5"
+  s.add_development_dependency "sqlite3"
+  s.add_development_dependency "activerecord", "~> 3.0"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
