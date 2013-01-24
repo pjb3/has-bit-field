@@ -206,4 +206,12 @@ class HasBitFieldTest < Test::Unit::TestCase
     assert s.save
   end
 
+  def test_environment_will_not_die_on_undefined_fields
+    assert_nothing_raised do
+      Person.class_eval do
+        has_bit_field :not_a_happy_field, :if_only_it_existed, :but_its_not_in_the_db, :we_had_hoped_for_it_but_its_not_there, :silence
+      end
+    end
+  end
+
 end
