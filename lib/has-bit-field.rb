@@ -39,16 +39,23 @@ module HasBitField
         end
       }
 
-      null_conditions = if columns_hash[bit_field_attribute.to_s].null
-          ["#{table_name}.#{bit_field_attribute} IS NOT NULL AND", "#{table_name}.#{bit_field_attribute} IS NULL OR"]
+      if columns_hash[bit_field_attribute.to_s].null
+        scope field, lambda {
+          where(arel_table[bit_field_attribute].not_eq(nil).
+                and(Arel::Nodes::InfixOperation.new(:&, arel_table[bit_field_attribute], 1<<i).not_eq(0)))
+        }
+        scope "not_#{field}", lambda {
+          where(arel_table[bit_field_attribute].eq(nil).
+                or(Arel::Nodes::InfixOperation.new(:&, arel_table[bit_field_attribute], 1<<i).eq(0)))
+        }
       else
-          ["", ""]
+        scope field, lambda {
+          where(Arel::Nodes::InfixOperation.new(:&, arel_table[bit_field_attribute], 1<<i).not_eq(0))
+        }
+        scope "not_#{field}", lambda {
+          where(Arel::Nodes::InfixOperation.new(:&, arel_table[bit_field_attribute], 1<<i).eq(0))
+        }
       end
-
-      class_eval %{
-        scope :#{field},     lambda { where(["#{null_conditions[0]} (#{table_name}.#{bit_field_attribute} & ?) != 0", #{field}_bit]) }
-        scope :not_#{field}, lambda { where(["#{null_conditions[1]} (#{table_name}.#{bit_field_attribute} & ?) = 0",  #{field}_bit]) }
-      }
 
     end
   end
