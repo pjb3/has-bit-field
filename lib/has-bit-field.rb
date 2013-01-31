@@ -39,19 +39,16 @@ module HasBitField
         end
       }
 
-      scope_sym = respond_to?(:validates) ? :scope : :named_scope
-
-      if columns_hash[bit_field_attribute.to_s].null
-        class_eval %{
-          send scope_sym, :#{field}, :conditions => ["#{table_name}.#{bit_field_attribute} IS NOT NULL AND (#{table_name}.#{bit_field_attribute} & ?) != 0", #{field}_bit]
-          send scope_sym, :not_#{field}, :conditions => ["#{table_name}.#{bit_field_attribute} IS NULL OR (#{table_name}.#{bit_field_attribute} & ?) = 0", #{field}_bit]          
-        }
+      null_conditions = if columns_hash[bit_field_attribute.to_s].null
+          ["#{table_name}.#{bit_field_attribute} IS NOT NULL AND", "#{table_name}.#{bit_field_attribute} IS NULL OR"]
       else
-        class_eval %{
-          send scope_sym, :#{field}, :conditions => ["(#{table_name}.#{bit_field_attribute} & ?) != 0", #{field}_bit]
-          send scope_sym, :not_#{field}, :conditions => ["(#{table_name}.#{bit_field_attribute} & ?) = 0", #{field}_bit]
-        }
+          ["", ""]
       end
+
+      class_eval %{
+        scope :#{field},     lambda { where(["#{null_conditions[0]} (#{table_name}.#{bit_field_attribute} & ?) != 0", #{field}_bit]) }
+        scope :not_#{field}, lambda { where(["#{null_conditions[1]} (#{table_name}.#{bit_field_attribute} & ?) = 0",  #{field}_bit]) }
+      }
 
     end
   end
