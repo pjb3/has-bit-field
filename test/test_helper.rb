@@ -11,3 +11,4 @@ require File.join(File.dirname(__FILE__), "../rails/init")
 require 'has-bit-field'
 
 #ActiveRecord::Base.logger = Logger.new($stdout)
+I18n.enforce_available_locales = false

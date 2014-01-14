@@ -1,19 +1,12 @@
-has-bit-field
-=============
+# has-bit-field
 
-has-bit-field allows you to use one attribute of an object to store a bit field which stores the boolean state for multiple flags.
+has-bit-field allows you to use one attribute of an object to store a bit field which stores the boolean state for multiple flags. Requires Rails 3.0 or greater.
 
-**Rails 3.0.x**
+## Usage
 
 Add the gem to your Gemfile. 
 
     gem 'has-bit-field'
-
-**Rails 2.3.x**
-
-To use this with Active Record, you would first require this gem in `config/environment.rb`:
-
-    config.gem "has-bit-field"
 
 Now in one of your models, you define a bit field like this:
 
@@ -24,9 +17,8 @@ Now in one of your models, you define a bit field like this:
 
 This means that your database will have an integer column called `bit_field` which will hold the actual bit field.  This will generate getter and setter methods for each of the fields.  It will also generate a method that has `_bit` as a suffix which will give you the decimal value of the bit that that field is represented by in the bit field.  Also there will be a named scope for that field, as well as a named scope prefixed with `not_`, if class you are adding the bit field to responds to `named_scope`.  You can use it like this:
 
-    $ script/console 
-    Loading development environment (Rails 2.3.2)
-    p =>> p = Person.new
+    $ rails c
+    >> p = Person.new
     => #<Person id: nil, bit_field: nil, created_at: nil, updated_at: nil>
     >> p.likes_ice_cream = "true"
     => "true"
@@ -62,7 +54,6 @@ Another gotcha to be aware of is when combining a bit field with Active Record's
       has_bit_field :bit_field, :likes_ice_cream, :plays_golf, :watches_tv, :reads_books
     end
       
-Copyright
----------
+## Copyright
 
 Copyright (c) 2009 Paul Barry. See LICENSE for details.
