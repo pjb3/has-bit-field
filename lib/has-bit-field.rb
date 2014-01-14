@@ -43,17 +43,21 @@ module HasBitField
         end
       }
 
-      scope_sym = respond_to?(:validates) ? :scope : :named_scope
-
       if columns_hash[bit_field_attribute.to_s].null
-        class_eval %{
-          send scope_sym, :#{field}, :conditions => ["#{table_name}.#{bit_field_attribute} IS NOT NULL AND (#{table_name}.#{bit_field_attribute} & ?) != 0", #{field}_bit]
-          send scope_sym, :not_#{field}, :conditions => ["#{table_name}.#{bit_field_attribute} IS NULL OR (#{table_name}.#{bit_field_attribute} & ?) = 0", #{field}_bit]          
+        scope field, lambda {
+          where(arel_table[bit_field_attribute].not_eq(nil).
+                and(Arel::Nodes::InfixOperation.new(:&, arel_table[bit_field_attribute], 1<<i).not_eq(0)))
+        }
+        scope "not_#{field}", lambda {
+          where(arel_table[bit_field_attribute].eq(nil).
+                or(Arel::Nodes::InfixOperation.new(:&, arel_table[bit_field_attribute], 1<<i).eq(0)))
         }
       else
-        class_eval %{
-          send scope_sym, :#{field}, :conditions => ["(#{table_name}.#{bit_field_attribute} & ?) != 0", #{field}_bit]
-          send scope_sym, :not_#{field}, :conditions => ["(#{table_name}.#{bit_field_attribute} & ?) = 0", #{field}_bit]
+        scope field, lambda {
+          where(Arel::Nodes::InfixOperation.new(:&, arel_table[bit_field_attribute], 1<<i).not_eq(0))
+        }
+        scope "not_#{field}", lambda {
+          where(Arel::Nodes::InfixOperation.new(:&, arel_table[bit_field_attribute], 1<<i).eq(0))
         }
       end
 
