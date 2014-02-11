@@ -1,17 +1,32 @@
 module HasBitField
+
+  def self.silently_fail=(val)
+    @silently_fail = val
+  end
+
+  def self.silently_fail?
+    @silently_fail || false
+  end
+
   # The first arguement +bit_field_attribute+ should be a symbol,
   # the name of attribute that will hold the actual bit field
   # all following arguments should also be symbols,
   # which will be the name of each flag in the bit field
   def has_bit_field(bit_field_attribute, *args)
     unless table_exists?
+      msg = "[has_bit_field] table undefined #{table_name}"
+      raise ArgumentError.new(msg) unless HasBitField.silently_fail?
       Rails.logger.error("[has_bit_field] table undefined #{table_name}") if defined?(Rails) && Rails.respond_to?(:logger)
       return
     end
+
     if columns_hash[bit_field_attribute.to_s].blank?
-      Rails.logger.error("[has_bit_field] column undefined #{bit_field_attribute}") if defined?(Rails) && Rails.respond_to?(:logger)
+      msg = "[has_bit_field] column undefined #{bit_field_attribute} (in #{table_name})"
+      raise ArgumentError.new(msg) unless HasBitField.silently_fail?
+      Rails.logger.error(msg) if defined?(Rails) && Rails.respond_to?(:logger)
       return
     end
+
     args.each_with_index do |field,i|
       class_eval %{
         class << self

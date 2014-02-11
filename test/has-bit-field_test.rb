@@ -34,6 +34,9 @@ class Skill < ActiveRecord::Base
 end
 
 class HasBitFieldTest < Test::Unit::TestCase
+  def setup
+    HasBitField.silently_fail = false
+  end
 
   def test_bit_field
     p = Person.new
@@ -206,7 +209,8 @@ class HasBitFieldTest < Test::Unit::TestCase
     assert s.save
   end
 
-  def test_environment_will_not_die_on_undefined_fields
+  def test_environment_will_not_die_on_undefined_fields_with_silently_fail_set
+    HasBitField.silently_fail = true
     assert_nothing_raised do
       Person.class_eval do
         has_bit_field :not_a_happy_field, :if_only_it_existed, :but_its_not_in_the_db, :we_had_hoped_for_it_but_its_not_there, :silence
@@ -214,4 +218,11 @@ class HasBitFieldTest < Test::Unit::TestCase
     end
   end
 
+  def test_environment_will_die_on_undefined_fields_with_silently_fail_unset
+    assert_raise(ArgumentError) do
+      Person.class_eval do
+        has_bit_field :not_a_happy_field, :if_only_it_existed, :but_its_not_in_the_db, :we_had_hoped_for_it_but_its_not_there, :silence
+      end
+    end
+  end
 end
