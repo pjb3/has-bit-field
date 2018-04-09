@@ -1,4 +1,4 @@
-# has-bit-field
+# has-bit-field [![Build Status](https://travis-ci.org/pjb3/has-bit-field.svg?branch=master)](https://travis-ci.org/pjb3/has-bit-field)
 
 has-bit-field allows you to use one attribute of an object to store a bit field which stores the boolean state for multiple flags. Requires Rails 3.0 or greater.
 
