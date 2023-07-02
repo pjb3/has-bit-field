@@ -1,1 +1,1 @@
-rvm ruby-1.9.3@has-bit-field --create
+rvm ruby-3.2.2@has-bit-field --create

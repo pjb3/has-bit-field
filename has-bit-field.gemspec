@@ -14,7 +14,10 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "has-bit-field"
   s.add_development_dependency "sqlite3"
-  s.add_development_dependency "activerecord", "~> 3.0"
+  s.add_development_dependency "activerecord", "~> 7.0"
+  s.add_development_dependency "test-unit", "~> 3.6"
+  #s.add_development_dependency "activerecord-nulldb-adapter", "~> 0.9"
+  s.add_development_dependency "rake"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")

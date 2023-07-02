@@ -7,7 +7,7 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 
 require 'test/unit'
 require 'active_record'
-require File.join(File.dirname(__FILE__), "../rails/init")
-require 'has-bit-field'
+require File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', 'has-bit-field'))
+ActiveRecord::Base.extend HasBitField
 
 #ActiveRecord::Base.logger = Logger.new($stdout)

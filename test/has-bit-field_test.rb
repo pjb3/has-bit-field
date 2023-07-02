@@ -1,15 +1,16 @@
-require File.join(File.dirname(__FILE__), 'test_helper')
+require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
 ActiveRecord::Base.establish_connection(
   :adapter => "sqlite3",
   :database  => ":memory:"
 )
 
-#ActiveRecord::Base.logger = Logger.new(STDOUT)
+ActiveRecord::Base.logger = Logger.new(STDOUT)
 
 ActiveRecord::Base.connection.create_table(:people) do |t|
   t.integer :bit_field, :null => true
 end
+ActiveRecord::Base.connection.schema_cache.add(:people)
 
 class Person < ActiveRecord::Base
   extend HasBitField
@@ -22,6 +23,7 @@ ActiveRecord::Base.connection.create_table(:skills) do |t|
   t.integer :outdoor_bit_field, :default => 0, :null => false
   t.integer :indoor_bit_field, :default => 0, :null => false
 end
+ActiveRecord::Base.connection.schema_cache.add(:skills)
 
 class Skill < ActiveRecord::Base
   extend HasBitField
@@ -103,17 +105,17 @@ class HasBitFieldTest < Test::Unit::TestCase
 
     c = Person.create! :bit_field => 0
 
-    assert_equal [b], Person.likes_ice_cream.all(:order => "id")
-    assert_equal [a,c], Person.not_likes_ice_cream.all(:order => "id")
+    assert_equal [b], Person.likes_ice_cream.order(id: :asc).to_a
+    assert_equal [a,c], Person.not_likes_ice_cream.order(id: :asc).to_a
 
-    assert_equal [a], Person.plays_golf.all(:order => "id")
-    assert_equal [b,c], Person.not_plays_golf.all(:order => "id")
+    assert_equal [a], Person.plays_golf.order(id: :asc).to_a
+    assert_equal [b,c], Person.not_plays_golf.order(id: :asc).to_a
 
-    assert_equal [b], Person.watches_tv.all(:order => "id")
-    assert_equal [a,c], Person.not_watches_tv.all(:order => "id")
+    assert_equal [b], Person.watches_tv.order(id: :asc).to_a
+    assert_equal [a,c], Person.not_watches_tv.order(id: :asc).to_a
 
-    assert_equal [a], Person.reads_books.all(:order => "id")
-    assert_equal [b,c], Person.not_reads_books.all(:order => "id")
+    assert_equal [a], Person.reads_books.order(id: :asc).to_a
+    assert_equal [b,c], Person.not_reads_books.order(id: :asc).to_a
   end
 
   def test_named_scopes_on_non_nullable_column
@@ -132,14 +134,14 @@ class HasBitFieldTest < Test::Unit::TestCase
 
     c = Skill.create! :plays_piano => true, :chops_trees => true
 
-    assert_equal [a,b,c], Skill.plays_piano.all(:order => "id")
-    assert_equal [], Skill.not_plays_piano.all(:order => "id")
+    assert_equal [a,b,c], Skill.plays_piano.order(id: :asc).to_a
+    assert_equal [], Skill.not_plays_piano.order(id: :asc).to_a
 
-    assert_equal [a], Skill.mops_floors.all(:order => "id")
-    assert_equal [b,c], Skill.not_mops_floors.all(:order => "id")
+    assert_equal [a], Skill.mops_floors.order(id: :asc).to_a
+    assert_equal [b,c], Skill.not_mops_floors.order(id: :asc).to_a
 
-    assert_equal [b], Skill.makes_soup.all(:order => "id")
-    assert_equal [a,c], Skill.not_makes_soup.all(:order => "id")
+    assert_equal [b], Skill.makes_soup.order(id: :asc).to_a
+    assert_equal [a,c], Skill.not_makes_soup.order(id: :asc).to_a
   end
 
   def test_dirty_attributes

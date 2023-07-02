@@ -4,16 +4,19 @@ module HasBitField
   # all following arguments should also be symbols,
   # which will be the name of each flag in the bit field
   def has_bit_field(bit_field_attribute, *args)
-    unless table_exists?
+    #puts "call has_bit_field: #{bit_field_attribute.inspect} -> #{args.inspect}"
+    if !table_exists?
       Rails.logger.error("[has_bit_field] table undefined #{table_name}") if defined?(Rails) && Rails.respond_to?(:logger)
       return
     end
     if columns_hash[bit_field_attribute.to_s].blank?
-      Rails.logger.error("[has_bit_field] column undefined #{bit_field_attribute}") if defined?(Rails) && Rails.respond_to?(:logger)
+      Rails.logger.error("[has_bit_field] column undefined #{bit_field_attribute.inspect}") if defined?(Rails) && Rails.respond_to?(:logger)
+
       return
     end
     args.each_with_index do |field,i|
-      class_eval %{
+      #puts "adding field: #{field.inspect}"
+      eval_methods = %{
         class << self
           def #{field}_bit
             (1 << #{i})
@@ -42,25 +45,24 @@ module HasBitField
           #{field} != #{field}_was
         end
       }
-
-      scope_sym = respond_to?(:validates) ? :scope : :named_scope
+      #puts "adding methods: #{eval_methods}"
+      class_eval eval_methods
 
       if columns_hash[bit_field_attribute.to_s].null
-        true_scope = %(["#{table_name}.#{bit_field_attribute} IS NOT NULL AND (#{table_name}.#{bit_field_attribute} & ?) != 0", #{field}_bit])
-        false_scope = %(["#{table_name}.#{bit_field_attribute} IS NULL OR (#{table_name}.#{bit_field_attribute} & ?) = 0", #{field}_bit])
-      else
-        true_scope = %(["(#{table_name}.#{bit_field_attribute} & ?) != 0", #{field}_bit])
-        false_scope = %(["(#{table_name}.#{bit_field_attribute} & ?) = 0", #{field}_bit])
-      end
-      if defined?(Rails) && Rails::VERSION::MAJOR > 3
-        class_eval %{
-          send scope_sym, :#{field}, -> { where(#{true_scope}) }
-          send scope_sym, :not_#{field}, -> { where(#{false_scope}) }
+        scope field, lambda {
+          where(arel_table[bit_field_attribute].not_eq(nil).
+                and(Arel::Nodes::InfixOperation.new(:&, arel_table[bit_field_attribute], 1<<i).not_eq(0)))
+        }
+        scope "not_#{field}", lambda {
+          where(arel_table[bit_field_attribute].eq(nil).
+                or(Arel::Nodes::InfixOperation.new(:&, arel_table[bit_field_attribute], 1<<i).eq(0)))
         }
       else
-        class_eval %{
-          send scope_sym, :#{field}, :conditions => #{true_scope}
-          send scope_sym, :not_#{field}, :conditions => #{false_scope}
+        scope field, lambda {
+          where(Arel::Nodes::InfixOperation.new(:&, arel_table[bit_field_attribute], 1<<i).not_eq(0))
+        }
+        scope "not_#{field}", lambda {
+          where(Arel::Nodes::InfixOperation.new(:&, arel_table[bit_field_attribute], 1<<i).eq(0))
         }
       end
 
